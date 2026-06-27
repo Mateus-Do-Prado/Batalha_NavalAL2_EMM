@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 #define AGUA 0
@@ -7,6 +8,22 @@
 #define TAMANHO 8
 #define NAVIO 1
 #define NAVIOATINGIDO 2
+#define TAMANHO_NAVIO 2  
+#define QTD_NAVIOS 4 
+
+typedef struct {
+    int linha[TAMANHO_NAVIO];
+    int coluna[TAMANHO_NAVIO];
+    int partesAtingidas;
+    int afundado;
+} Navio;
+
+int verificaSobreposicao(int **campo, int tamanho, int linha, int coluna) {
+    if (linha < 0 || linha >= tamanho || coluna < 0 || coluna >= tamanho)
+        return 1;
+
+    return campo[linha][coluna] != AGUA;
+}
 
 void limpar_campo(int **campo, int tamanho){
     if(campo != NULL){
@@ -83,7 +100,7 @@ int main(){
 
             seu_campo = AlocarMatriz(TAMANHO);
             campo_visao_adversario = AlocarMatriz(TAMANHO);
-
+    Navio navios_jogador[QTD_NAVIOS];
             if(campo_visao_adversario != NULL){
                 for(int i = 0; i < TAMANHO; i++){
                     for(int j = 0; j < TAMANHO; j++){
@@ -93,6 +110,37 @@ int main(){
             }
 
             if(seu_campo != NULL && campo_visao_adversario != NULL){
+        for(int i = 0; i < QTD_NAVIOS; i++){
+
+                    int posicionado = 0;
+
+                    while(!posicionado){
+
+                        int orientacao = rand() % 2;
+
+                        int lin1 = rand() % TAMANHO;
+                        int col1 = rand() % TAMANHO;
+
+                        int lin2 = lin1 + (orientacao == 1 ? 1 : 0);
+                        int col2 = col1 + (orientacao == 0 ? 1 : 0);
+
+                        if(!verificaSobreposicao(seu_campo, TAMANHO, lin1, col1) &&
+                           !verificaSobreposicao(seu_campo, TAMANHO, lin2, col2)){
+
+                            navios_jogador[i].linha[0] = lin1;
+                            navios_jogador[i].coluna[0] = col1;
+                            navios_jogador[i].linha[1] = lin2;
+                            navios_jogador[i].coluna[1] = col2;
+                            navios_jogador[i].partesAtingidas = 0;
+                            navios_jogador[i].afundado = 0;
+
+                            seu_campo[lin1][col1] = NAVIO;
+                            seu_campo[lin2][col2] = NAVIO;
+
+                            posicionado = 1;
+                        }
+                    }
+                }
 
                 printf("\nMatrizes alocadas com sucesso!\n");
 
