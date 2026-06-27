@@ -78,6 +78,40 @@ void mostrarmatriz(int **matriz, int tam, const char *titulo){
         printf("\n");
     }
 }
+      void posicionarNaviosAleatorio(int **campo, Navio *navios, int tamanho, int qtd_navios) {
+    for (int i = 0; i < qtd_navios; i++) {
+        int posicionado = 0;
+
+        while (!posicionado) {
+            int orientacao = rand() % 2;
+
+            int lin1 = rand() % tamanho;
+            int col1 = rand() % tamanho;
+
+            int lin2 = lin1 + (orientacao == 1 ? 1 : 0);
+            int col2 = col1 + (orientacao == 0 ? 1 : 0);
+
+            
+            if (lin2 < tamanho && col2 < tamanho) {
+                if (!verificaSobreposicao(campo, tamanho, lin1, col1) &&
+                    !verificaSobreposicao(campo, tamanho, lin2, col2)) {
+
+                    navios[i].linha[0] = lin1;
+                    navios[i].coluna[0] = col1;
+                    navios[i].linha[1] = lin2;
+                    navios[i].coluna[1] = col2;
+                    navios[i].partesAtingidas = 0;
+                    navios[i].afundado = 0;
+
+                    campo[lin1][col1] = NAVIO;
+                    campo[lin2][col2] = NAVIO;
+
+                    posicionado = 1;
+                }
+            }
+        }
+    }
+}
 
 int main(){
 
@@ -86,9 +120,13 @@ int main(){
     printf("3 = Carregar ultimo Jogo\n");
     printf("4 = Sair\n");
 
+        srand((unsigned int)time(NULL));
+
     int n;
     int **seu_campo = NULL;
     int **campo_visao_adversario = NULL;
+    int **campo_computador = NULL;
+    int **visao_computador = NULL;
 
     scanf("%d", &n);
 
@@ -100,56 +138,49 @@ int main(){
 
             seu_campo = AlocarMatriz(TAMANHO);
             campo_visao_adversario = AlocarMatriz(TAMANHO);
-    Navio navios_jogador[QTD_NAVIOS];
-            if(campo_visao_adversario != NULL){
+            campo_computador = AlocarMatriz(TAMANHO);
+            visao_computador = AlocarMatriz(TAMANHO);
+
+
+        int **campo_computador = AlocarMatriz(TAMANHO); 
+        int **visao_computador = AlocarMatriz(TAMANHO);    
+
+      Navio navios_jogador[QTD_NAVIOS];
+      Navio navios_computador[QTD_NAVIOS];
+      
+      if(campo_visao_adversario != NULL){
                 for(int i = 0; i < TAMANHO; i++){
                     for(int j = 0; j < TAMANHO; j++){
                         campo_visao_adversario[i][j] = AGUADESCONHECIDA;
+                        visao_computador[i][j] = AGUADESCONHECIDA;
+                    }
+                }
+            }
+
+            if(visao_computador != NULL){
+                for(int i = 0; i < TAMANHO; i++){
+                    for(int j = 0; j < TAMANHO; j++){
+                        visao_computador[i][j] = AGUADESCONHECIDA;
                     }
                 }
             }
 
             if(seu_campo != NULL && campo_visao_adversario != NULL){
-        for(int i = 0; i < QTD_NAVIOS; i++){
+        posicionarNaviosAleatorio(seu_campo, navios_jogador, TAMANHO, QTD_NAVIOS);
+    posicionarNaviosAleatorio(campo_computador, navios_computador, TAMANHO, QTD_NAVIOS);
 
-                    int posicionado = 0;
+    printf("\nMatrizes alocadas e navios de ambos posicionados com sucesso!\n");
 
-                    while(!posicionado){
+    
+    mostrarmatriz(seu_campo, TAMANHO, "SEU CAMPO (NAVIOS = 1)");
+    mostrarmatriz(campo_visao_adversario, TAMANHO, "CAMPO DO ADVERSARIO");
 
-                        int orientacao = rand() % 2;
-
-                        int lin1 = rand() % TAMANHO;
-                        int col1 = rand() % TAMANHO;
-
-                        int lin2 = lin1 + (orientacao == 1 ? 1 : 0);
-                        int col2 = col1 + (orientacao == 0 ? 1 : 0);
-
-                        if(!verificaSobreposicao(seu_campo, TAMANHO, lin1, col1) &&
-                           !verificaSobreposicao(seu_campo, TAMANHO, lin2, col2)){
-
-                            navios_jogador[i].linha[0] = lin1;
-                            navios_jogador[i].coluna[0] = col1;
-                            navios_jogador[i].linha[1] = lin2;
-                            navios_jogador[i].coluna[1] = col2;
-                            navios_jogador[i].partesAtingidas = 0;
-                            navios_jogador[i].afundado = 0;
-
-                            seu_campo[lin1][col1] = NAVIO;
-                            seu_campo[lin2][col2] = NAVIO;
-
-                            posicionado = 1;
-                        }
-                    }
-                }
-
-                printf("\nMatrizes alocadas com sucesso!\n");
-
-                mostrarmatriz(seu_campo, TAMANHO, "SEU CAMPO");
-                mostrarmatriz(campo_visao_adversario, TAMANHO, "CAMPO DE VISAO DO ADVERSARIO");
-
-                limpar_campo(seu_campo, TAMANHO);
-                limpar_campo(campo_visao_adversario, TAMANHO);
-            }
+    
+    limpar_campo(seu_campo, TAMANHO);
+    limpar_campo(campo_visao_adversario, TAMANHO);
+    limpar_campo(campo_computador, TAMANHO);
+    limpar_campo(visao_computador, TAMANHO);
+}
 
             break;
 
